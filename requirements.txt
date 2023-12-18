@@ -1,0 +1,10 @@
+dash
+dash_bootstrap_components
+dash_extensions
+flask
+numpy
+plotly
+plotly_resampler
+requests
+trace_updater
+pandas
