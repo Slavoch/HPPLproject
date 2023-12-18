@@ -24,6 +24,7 @@ from dash_extensions.enrich import (
 from trace_updater import TraceUpdater
 
 from plotly_resampler import FigureResampler
+import re
 
 # --------------------------------------Globals ---------------------------------------
 app = DashProxy(
@@ -134,17 +135,18 @@ def add_or_remove_graph(add_graph, remove_graph, port_id, gc_children, remove_bt
 
     gc_children = [] if gc_children is None else gc_children
 
-    clicked_btns = [p["prop_id"] for p in callback_context.triggered]
-    if any("remove-graph" in btn_name for btn_name in clicked_btns):
+    clicked_btn = callback_context.triggered[0]["prop_id"].split(".")[0]
+    if "remove-graph" in clicked_btn:
         if not len(gc_children):
             return no_update
         new_children = []
+        btn_index = re.search('"index":"(.*)","type"', clicked_btn).group(1)
         for child in gc_children:
-            if child["props"]["id"]["index"] != remove_btn_id[0]["index"]:
+            if child["props"]["id"]["index"] != btn_index:
                 new_children.append(child)
         return new_children
 
-    #### create a new graph ########
+    #### create a new graph ####
     if add_graph is None or port_id is None:
         return no_update
 
@@ -174,6 +176,7 @@ def add_or_remove_graph(add_graph, remove_graph, port_id, gc_children, remove_bt
     return gc_children
 
 
+##-------------------------------- FOR plotly resample updates ------------------------------##
 # This method constructs the FigureResampler graph and caches it on the server side
 @app.callback(
     Output({"type": "dynamic-graph", "index": MATCH}, "figure"),
