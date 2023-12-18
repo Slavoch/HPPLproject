@@ -6,8 +6,14 @@ from plotly_resampler import FigureResampler
 
 
 def generate_fig(x, y, legend=None, title=None):
+    # Initialize FigureResampler with a Plotly Figure
     fr = FigureResampler(go.Figure(), verbose=True)
-    fr.add_trace(go.Scattergl(name=legend), hf_x=x, hf_y=y)
+
+    # Add a scatter plot trace to the resampler
+    # Use Scatter instead of Scattergl for standard scatter plot
+    fr.add_trace(go.Scatter(name=legend, mode='markers'), hf_x=x, hf_y=y)
+
+    # Update the layout of the figure
     fr.update_layout(
         height=350,
         showlegend=True,
@@ -16,4 +22,6 @@ def generate_fig(x, y, legend=None, title=None):
         title=title,
         title_x=0.5,
     )
+
+    # Return the FigureResampler object
     return fr
