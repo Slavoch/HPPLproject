@@ -25,6 +25,7 @@ from trace_updater import TraceUpdater
 
 from plotly_resampler import FigureResampler
 import re
+from UI_bloks.plotly_blocks import generate_fig
 
 
 def run_UI_server(server, data):
@@ -36,20 +37,6 @@ def run_UI_server(server, data):
         external_stylesheets=[dbc.themes.LUX],
         transforms=[ServersideOutputTransform(), TriggerTransform()],
     )
-    # data = {
-    #     "1000": dict(
-    #         title="empty",
-    #         x=np.linspace(0, 1, 1000000),
-    #         y=np.random.random(1000000),
-    #         legend="rand",
-    #     ),
-    #     "2000": dict(
-    #         title="empty",
-    #         x=np.linspace(0, 1, 10),
-    #         y=np.random.random(10),
-    #         legend="rand",
-    #     ),
-    # }
 
     # -------- Construct the app layout --------
     app.layout = html.Div(
@@ -86,6 +73,7 @@ def run_UI_server(server, data):
                                 dcc.Input(
                                     id="nbr-datapoints",
                                     placeholder="n",
+                                    value=1000,
                                     type="number",
                                     style={"margin-left": "10px"},
                                 ),
@@ -144,7 +132,7 @@ def run_UI_server(server, data):
             if not len(gc_children):
                 return no_update
             new_children = []
-            btn_index = re.search('"index":"(.*)","type"', clicked_btn).group(1)
+            btn_index = re.search('"index":"(.*)",', clicked_btn).group(1)
             for child in gc_children:
                 if child["props"]["id"]["index"] != btn_index:
                     new_children.append(child)
@@ -168,6 +156,11 @@ def run_UI_server(server, data):
                 dcc.Interval(
                     id={"type": "interval", "index": uid}, max_intervals=1, interval=1
                 ),
+                dcc.Interval(
+                    id={"type": "interval-data-update", "index": uid},
+                    interval=2000,  # im ms
+                    n_intervals=0,
+                ),
                 dbc.Button(
                     "Remove graph",
                     id={"type": "remove-graph-btn", "index": uid},
@@ -183,32 +176,55 @@ def run_UI_server(server, data):
         gc_children.append(new_child)
         return gc_children
 
+    ##------------------------------- Update data in graph --------------------------------------##
+    @app.callback(
+        Output(
+            {"type": "dynamic-graph", "index": MATCH}, "figure", allow_duplicate=True
+        ),
+        Input({"type": "interval-data-update", "index": MATCH}, "n_intervals"),
+        State({"type": "dynamic-graph", "index": MATCH}, "id"),
+        # State({"type": "dynamic-graph", "index": MATCH}, "figure"),
+        prevent_initial_call=True,
+    )
+    def update_data_in_graph(n_intervals, id):
+        data_pointer = None
+
+        for port_id in data.keys():
+            if id["index"] in data[port_id]["active_in"]:
+                data_pointer = data[port_id]
+                break
+        if data_pointer is None:
+            raise Exception("LOOOL")
+
+        x = data_pointer["x"]
+        y = data_pointer["y"]
+
+        fr = generate_fig(x, y)
+        Serverside(fr)
+        return fr
+
     ##-------------------------------- FOR plotly resample updates ------------------------------##
     # This method constructs the FigureResampler graph and caches it on the server side
     @app.callback(
         Output({"type": "dynamic-graph", "index": MATCH}, "figure"),
         Output({"type": "store", "index": MATCH}, "data"),
         State("nbr-datapoints", "value"),
-        State("add-graph-btn", "n_clicks"),
+        # State("add-graph-btn", "n_clicks"),
+        State({"type": "dynamic-graph", "index": MATCH}, "id"),
         Trigger({"type": "interval", "index": MATCH}, "n_intervals"),
         prevent_initial_call=True,
     )
-    def construct_display_graph(port_id, n_added_graphs) -> FigureResampler:
-        # Figure construction logic based on state variables
-        port_data = data[str(port_id)]
+    def construct_display_graph(port_id, container_id) -> FigureResampler:
+        ## save index of active containers in data
+        container_index = container_id["index"]
+        data_index = str(port_id)
+        data[data_index]["active_in"].append(container_index)
+
+        ## generate gfaph from data
+        port_data = data[data_index]
         x = port_data["x"]
         y = port_data["y"]
-
-        fr = FigureResampler(go.Figure(), verbose=True)
-        fr.add_trace(go.Scattergl(name=f"{port_data['legend']}"), hf_x=x, hf_y=y)
-        fr.update_layout(
-            height=350,
-            showlegend=True,
-            legend=dict(orientation="h", y=1.12, xanchor="right", x=1),
-            template="seaborn",
-            title=f"{port_data['title']}",
-            title_x=0.5,
-        )
+        fr = generate_fig(x, y)
         return fr, Serverside(fr)
 
     @app.callback(
