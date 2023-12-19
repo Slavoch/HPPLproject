@@ -3,14 +3,13 @@ import json
 import numpy as np
 import server
 
-
 # def run_data_server():
 #     last_msg = None
 #     app = Flask("Dash app data server")
 
 #     @app.route("/<slot_name>", methods=["POST"])
 #     def hello(slot_name):
-#         print("LOOOOOOOOOOOOOOOOOOL")
+#         print("LOOOOOOOOOOL")
 #         data = json.loads(request.data)
 #         last_msg = [slot_name, data]
 #         print(data)
@@ -20,8 +19,6 @@ import server
 
 
 # run_data_server()
-
-
 def run_data_server(data_base):
     app = Flask("Dash app data server")
 
