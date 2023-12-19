@@ -5,8 +5,7 @@ import server
 
 # def run_data_server():
 #     last_msg = None
-#     app = Flask("Dash app data server")
-
+#     app = Flask("dash app data server")
 #     @app.route("/<slot_name>", methods=["POST"])
 #     def hello(slot_name):
 #         print("LOOOOOOOOOOL")
@@ -17,15 +16,14 @@ import server
 
 #     app.run(debug=True)
 
-
 # run_data_server()
 def run_data_server(data_base):
     app = Flask("Dash app data server")
 
     def generate_empy_slot():
         slot = dict(
-            x=[],
-            y=[],
+            X=[],
+            Y=[],
         )
         return slot
 
@@ -40,13 +38,12 @@ def run_data_server(data_base):
 
         data = json.loads(request.data)
         db_slot = data_base[slot_name]
-        db_slot["x"] = np.hstack([db_slot["x"], data["x"]])
-        db_slot["y"] = np.hstack([db_slot["y"], data["y"]])
+        db_slot[" X "] = np.hstack([db_slot[" X "], data[" X "]])
+        db_slot[" Y "] = np.hstack([db_slot[" Y "], data[" Y "]])
         data_base[slot_name] = db_slot
         return "1"
 
     app.run(debug=True)
-
 
 if __name__ == "__main__":
     data_base = {}
@@ -54,8 +51,8 @@ if __name__ == "__main__":
 
     def generate_empy_slot():
         slot = dict(
-            x=[],
-            y=[],
+            X=[],
+            Y=[],
             legend="None",
             title="None",
             active_in=[],

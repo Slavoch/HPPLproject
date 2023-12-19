@@ -26,7 +26,6 @@ from plotly_resampler import FigureResampler
 import re
 from UI_bloks.plotly_blocks import generate_fig
 
-
 def run_UI_server(server, data):
     # --------------------------------------Globals ---------------------------------------
     app = DashProxy(
