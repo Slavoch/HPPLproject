@@ -2,8 +2,6 @@ from flask import Flask, request, jsonify
 import json
 import numpy as np
 import server
-
-
 # def run_data_server():
 #     last_msg = None
 #     app = Flask("Dash app data server")
