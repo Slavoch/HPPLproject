@@ -1,7 +1,6 @@
 from uuid import uuid4
 
 import dash_bootstrap_components as dbc
-import numpy as np
 import plotly.graph_objects as go
 from dash import (
     MATCH,

@@ -7,4 +7,5 @@ plotly
 plotly_resampler
 requests
 trace_updater
-pandas
+jupyter
+python-language-server
