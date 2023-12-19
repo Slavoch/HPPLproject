@@ -115,7 +115,7 @@ def run_UI_server(server, data):
     def add_or_remove_graph(
         add_graph, remove_graph, port_id, gc_children, remove_btn_id
     ):
-        #### check of existance such data with demanded port ####
+        #### Check of existance such data with demanded port ####
         try:
             data[str(port_id)]
         except KeyError as e:
@@ -136,7 +136,8 @@ def run_UI_server(server, data):
                     new_children.append(child)
             return new_children
 
-        #### create a new graph ####
+        #### Create a new graph ####
+
         if add_graph is None or port_id is None:
             return no_update
 
@@ -194,8 +195,8 @@ def run_UI_server(server, data):
         if data_pointer is None:
             raise Exception("LOOOL")
 
-        x = data_pointer["x"]
-        y = data_pointer["y"]
+        X = data_pointer["x"]
+        Y = data_pointer["y"]
 
         fr = generate_fig(x, y)
         Serverside(fr)
@@ -218,11 +219,11 @@ def run_UI_server(server, data):
         data_index = str(port_id)
         data[data_index]["active_in"].append(container_index)
 
-        ## generate gfaph from data
+        ## Generate gfaph from data
         port_data = data[data_index]
-        x = port_data["x"]
-        y = port_data["y"]
-        fr = generate_fig(x, y)
+        X = port_data[" X "]
+        Y = port_data[" X "]
+        fr = generate_fig(X, Y)
         return fr, Serverside(fr)
 
     @app.callback(
