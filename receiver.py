@@ -4,24 +4,6 @@ import numpy as np
 import server
 
 
-# def run_data_server():
-#     last_msg = None
-#     app = Flask("Dash app data server")
-
-#     @app.route("/<slot_name>", methods=["POST"])
-#     def hello(slot_name):
-#         print("LOOOOOOOOOOOOOOOOOOL")
-#         data = json.loads(request.data)
-#         last_msg = [slot_name, data]
-#         print(data)
-#         return "1"
-
-#     app.run(debug=True)
-
-
-# run_data_server()
-
-
 def run_data_server(data_base):
     app = Flask("Dash app data server")
 
@@ -62,6 +44,7 @@ if __name__ == "__main__":
             legend="None",
             title="None",
             active_in=[],
+            is_changed=True,
         )
         return slot
 
@@ -78,6 +61,11 @@ if __name__ == "__main__":
         db_slot = data_base[slot_name]
         db_slot["x"] = np.hstack([db_slot["x"], data["x"]])
         db_slot["y"] = np.hstack([db_slot["y"], data["y"]])
+        db_slot["is_changed"] = True
+
+        if "title" in data:
+            db_slot["title"] = data["title"]
+
         data_base[slot_name] = db_slot
         # print(data_base)
         return "1"

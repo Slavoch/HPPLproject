@@ -47,25 +47,6 @@ def run_UI_server(server, data):
                     dbc.Col(
                         dbc.Form(
                             [
-                                dbc.Label("port id", style={"margin-left": "10px"}),
-                                html.Br(),
-                                dcc.Input(
-                                    id="input-port-connect",
-                                    placeholder="n",
-                                    type="number",
-                                    style={"margin-left": "10px"},
-                                ),
-                                *([html.Br()] * 2),
-                                dbc.Button(
-                                    "Connect new port",
-                                    id="connect-port-btn",
-                                    color="primary",
-                                    style={
-                                        "textalign": "center",
-                                        "width": "max-content",
-                                        "margin-left": "10px",
-                                    },
-                                ),
                                 *([html.Br()] * 2),
                                 dbc.Label("port id", style={"margin-left": "10px"}),
                                 html.Br(),
@@ -182,10 +163,10 @@ def run_UI_server(server, data):
         ),
         Input({"type": "interval-data-update", "index": MATCH}, "n_intervals"),
         State({"type": "dynamic-graph", "index": MATCH}, "id"),
-        # State({"type": "dynamic-graph", "index": MATCH}, "figure"),
+        State({"type": "dynamic-graph", "index": MATCH}, "figure"),
         prevent_initial_call=True,
     )
-    def update_data_in_graph(n_intervals, id):
+    def update_data_in_graph(n_intervals, id, fig):
         data_pointer = None
 
         for port_id in data.keys():
@@ -195,11 +176,15 @@ def run_UI_server(server, data):
         if data_pointer is None:
             raise Exception("LOOOL")
 
+        if data_pointer["is_changed"] == False:
+            return fig
+
         x = data_pointer["x"]
         y = data_pointer["y"]
 
-        fr = generate_fig(x, y)
+        fr = generate_fig(x, y, title=data_pointer["title"])
         Serverside(fr)
+        data_pointer["is_changed"] = False
         return fr
 
     ##-------------------------------- FOR plotly resample updates ------------------------------##
@@ -223,7 +208,7 @@ def run_UI_server(server, data):
         port_data = data[data_index]
         x = port_data["x"]
         y = port_data["y"]
-        fr = generate_fig(x, y)
+        fr = generate_fig(x, y, title=port_data["title"])
         return fr, Serverside(fr)
 
     @app.callback(
