@@ -1,10 +1,6 @@
-import numpy as np
+
 import plotly.graph_objects as go
-from trace_updater import TraceUpdater
-
 from plotly_resampler import FigureResampler
-
-
 def generate_fig(x, y, legend=None, title=None):
     # Initialize FigureResampler with a Plotly Figure
     fr = FigureResampler(go.Figure(), verbose=True)

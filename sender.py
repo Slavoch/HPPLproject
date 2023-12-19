@@ -1,6 +1,6 @@
 import requests
 import json
-import numpy as np
+
 
 
 def generate_message(x, y, title=None, x_label=None, y_label=None, legend=None):
