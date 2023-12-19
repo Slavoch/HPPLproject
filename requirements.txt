@@ -9,3 +9,4 @@ requests
 trace_updater
 jupyter
 python-language-server
+pandas
