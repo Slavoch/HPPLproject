@@ -195,8 +195,8 @@ def run_UI_server(server, data):
         if data_pointer is None:
             raise Exception("LOOOL")
 
-        X = data_pointer["x"]
-        Y = data_pointer["y"]
+        X = data_pointer[" X "]
+        Y = data_pointer[" Y "]
 
         fr = generate_fig(x, y)
         Serverside(fr)
